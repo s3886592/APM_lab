@@ -4,7 +4,6 @@ library(caret)
 library(corrplot)
 library(dplyr)
 
-
 # Labs --------------------------------------------------------------------
 
 data("segmentationOriginal")
@@ -122,4 +121,36 @@ filtered <- bbbDescr[, -highCorr]
 
 
 
+byPredByClass <- apply(Soybean[, hasMissing], 2,
+                       function(x, y) {
+                         tab <- table(is.na(x), y)
+                         tab[2, ] / apply(tab, 2, sum)
+                       },
+                       y = Soybean$Class)
 
+byPredByClass <- byPredByClass[apply(byPredByClass, 1, sum) > 0,]
+byPredByClass <- byPredByClass[, apply(byPredByClass, 2, sum) > 0]
+t(byPredByClass)
+
+
+orderedVars <- unlist(lapply(Soybean, is.ordered))
+orderedVars <- names(orderedVars)[orderedVars]
+
+completeClasses <- as.character(unique(Soybean$Class[complete.cases(Soybean)]))
+Soybean3 <- subset(Soybean, Class %in% completeClasses)
+for(i in orderedVars) Soybean3[, i] <- factor(as.character(Soybean3[, i]))
+
+dummyInfo <- dummyVars(Class ~ ., data = Soybean3)
+dummies <- predict(dummyInfo, Soybean3)
+
+predDistInfo <- nearZeroVar(dummies, saveMetrics = TRUE)
+head(predDistInfo)
+
+sum(predDistInfo$nzv)
+mean(predDistInfo$nzv)
+
+
+rawCorr <- cor(filter1)
+transCorr <- cor(transformed)
+ssData <- spatialSign(scale(filter1))
+ssCorr <- cor(ssData)
