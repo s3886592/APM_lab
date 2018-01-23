@@ -4,6 +4,16 @@ library(modelr)
 library(cowplot)
 library(lubridate)
 
+orgwd <- getwd()
+setwd(paste0(orgwd,"/data"))
+
+
+
+
+
+
+
+
 inflow <- read_tsv("Francis_upper_inflow.txt", comment = "#")
 outflow <- read_tsv("Francis_upper_out.txt", comment = "#")
 
